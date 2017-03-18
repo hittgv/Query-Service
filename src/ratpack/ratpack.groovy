@@ -11,6 +11,10 @@ import static ratpack.jackson.Jackson.json
 
 ratpack {
 
+    serverConfig {
+        env()
+    }
+
     bindings {
         ConfigData configData = ConfigData.of { c ->
             c.env()
