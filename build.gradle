@@ -4,10 +4,12 @@ buildscript {
     }
     dependencies {
         classpath "io.ratpack:ratpack-gradle:1.4.5"
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
     }
 }
 
 apply plugin: "io.ratpack.ratpack-groovy"
+apply plugin: 'com.github.johnrengelman.shadow'
 
 repositories {
     jcenter()
