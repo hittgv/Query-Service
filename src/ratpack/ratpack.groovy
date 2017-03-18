@@ -24,6 +24,13 @@ ratpack {
     }
 
     handlers {
+        all { ctx ->
+            def headers = response.getHeaders()
+            headers.set("Access-Control-Allow-Origin", "*")
+            headers.set("Access-Control-Allow-Headers", "x-requested-with, origin, content-type, accept")
+
+            ctx.next()
+        }
         get('rating') { AmazonDynamoDBAsync client ->
 
             def url = request.queryParams.get('url')
