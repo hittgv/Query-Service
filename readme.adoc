@@ -1,0 +1,15 @@
+# Simple Query Service
+
+## Basic API
+`GET /rating?url=http%3A%2F%2Fgoogle.com%2Fnews`
+
+`url` variable must be URL encoded
+
+### Response Body
+```
+return 
+
+{
+  "rating":1
+}
+```
