@@ -14,6 +14,6 @@ repositories {
 }
 
 dependencies {
-    compile ratpack.dependency("jackson")
+    compile 'ch.qos.logback:logback-classic:1.2.1'
 }
 
