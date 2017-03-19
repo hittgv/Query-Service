@@ -21,3 +21,6 @@ dependencies {
     compile ratpack.dependency("guice")
 }
 
+task stage {
+    dependsOn installDist
+}
