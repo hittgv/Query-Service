@@ -2,12 +2,16 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsync
 import com.amazonaws.services.dynamodbv2.model.AttributeValue
 import com.amazonaws.services.dynamodbv2.model.GetItemRequest
 import com.amazonaws.services.dynamodbv2.model.PutItemRequest
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 import io.restall.hittgv.query.dynamo.DynamoDBConfig
 import io.restall.hittgv.query.dynamo.DynamoDBModule
 import ratpack.config.ConfigData
+import ratpack.http.client.HttpClient
 
 import static ratpack.groovy.Groovy.ratpack
 import static ratpack.jackson.Jackson.json
+import static ratpack.jackson.Jackson.toJson
 
 ratpack {
 
@@ -52,11 +56,25 @@ ratpack {
             if (response && response.getItem()) {
                 render(json([rating: response.getItem().get("Rating").getN()]))
             } else {
-                def item = [URLKey: new AttributeValue().withS(urlKey), Rating: new AttributeValue().withN("5")]
-                PutItemRequest putItemRequest = new PutItemRequest().withTableName("test").withItem(item)
-                client.putItem(putItemRequest)
+                final MANAGER_BASE_URL = System.getenv("MANAGER_BASE_URL")
+                def jsonSlurper = new JsonSlurper()
+                HttpClient httpClient = context.get(HttpClient.class)
+                String requestBody = JsonOutput.toJson([url: url])
 
-                render(json([rating: "4"]))
+                httpClient.post(new URI(MANAGER_BASE_URL), {req -> req.body.text(requestBody)}).then({managerResponse ->
+                    if(managerResponse.getStatusCode() == 200) {
+                        final def managerResponseObject = jsonSlurper.parseText(managerResponse.getBody().getText())
+                        final def rating = managerResponseObject.assignedScore
+
+                        def item = [URLKey: new AttributeValue().withS(urlKey), Rating: new AttributeValue().withN(rating)]
+                        PutItemRequest putItemRequest = new PutItemRequest().withTableName("test").withItem(item)
+                        client.putItem(putItemRequest)
+
+                        render(json([rating: rating]))
+                    } else {
+                        clientError(500)
+                    }
+                })
             }
         }
     }
