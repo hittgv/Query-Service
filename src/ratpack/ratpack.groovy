@@ -66,7 +66,7 @@ ratpack {
                         final def managerResponseObject = jsonSlurper.parseText(managerResponse.getBody().getText())
                         final def rating = managerResponseObject.assignedScore
 
-                        def item = [URLKey: new AttributeValue().withS(urlKey), Rating: new AttributeValue().withN(rating)]
+                        def item = [URLKey: new AttributeValue().withS(urlKey), Rating: new AttributeValue().withN(rating.toString())]
                         PutItemRequest putItemRequest = new PutItemRequest().withTableName("test").withItem(item)
                         client.putItem(putItemRequest)
 
